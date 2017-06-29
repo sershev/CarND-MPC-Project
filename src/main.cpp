@@ -103,13 +103,15 @@ int main() {
               y_values(i) = -x*sin(psi) + y*cos(psi);
           }
 
-          Eigen::VectorXd coeffs = polyfit(x_values, y_values,3);
+          Eigen::VectorXd coeffs = polyfit(x_values, y_values, 3);
 
-          double cte = polyeval(coeffs,px)-py ;
+          double cte = polyeval(coeffs, 0) ;
           double epsi = -atan(coeffs[1]) ;
 
           Eigen::VectorXd state(6);
-          state << 0,0,0,v,cte,epsi; // car view
+          //handle latency
+          double x_with_100ms_latency = v*(1/36000)*cos(coeffs[1]);
+          state << x_with_100ms_latency,0,0,v,cte,epsi; // car view
 
           vector<double> actuators = mpc.Solve(state, coeffs);
 
@@ -128,7 +130,7 @@ int main() {
           msgJson["steering_angle"] = steer_value/deg2rad(25);
           msgJson["throttle"] = throttle_value;
 
-          //Display the MPC predicted trajectory 
+          //Display the MPC predicted trajectory
           vector<double> mpc_x_vals;
           vector<double> mpc_y_vals;
 
@@ -137,7 +139,7 @@ int main() {
 
 
           int predicted_steps = (actuators.size()-2)/2;
-          for (int i = 0; i < predicted_steps; ++i) {
+          for (int i = 0; i < predicted_steps; i+=2) {
               mpc_x_vals.push_back(actuators[i+2]);
               mpc_y_vals.push_back(actuators[i+2+1]);
           }

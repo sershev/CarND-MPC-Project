@@ -6,7 +6,7 @@
 using CppAD::AD;
 
 // TODO: Set the timestep length and duration
-size_t N = 25;
+size_t N = 15;
 double dt = 0.05;
 
 // This value assumes the model presented in the classroom is used.
@@ -46,18 +46,18 @@ class FG_eval {
       fg[0] = 0;
 
       for (size_t i = 0; i < N; ++i) {
-          fg[0] += CppAD::pow(vars[cte_start+i],2);
-          fg[0] += 100*CppAD::pow(vars[epsi_start+i],2);
+          fg[0] += 0.5*CppAD::pow(vars[cte_start+i],2);
+          fg[0] += 20*CppAD::pow(vars[epsi_start+i],2);
           fg[0] += CppAD::pow(ref_v - vars[v_start+i],2);
       }
 
       for (size_t i = 0; i < N-1; ++i) {
-          fg[0] += 100*CppAD::pow(vars[delta_start+i],2) * vars[v_start+i];
+          fg[0] += 200*CppAD::pow(vars[delta_start+i],2);
           fg[0] += CppAD::pow(vars[a_start+i],2);
       }
 
       for (size_t i = 0; i < N-2; ++i) {
-          fg[0] += 100*CppAD::pow(vars[delta_start+i+1]-vars[delta_start+i],2);
+          fg[0] += 200000*CppAD::pow(vars[delta_start+i+1]-vars[delta_start+i],2);
           fg[0] += CppAD::pow(vars[a_start+i+1]-vars[a_start+i],2);
       }
 
@@ -225,9 +225,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // creates a 2 element double vector.
   std::cout << "Cost " << cost << std::endl;
   vector<double> result = {solution.x[delta_start], solution.x[a_start]};
-  for (int i = 0; i < N; ++i) {
-      result.push_back(solution.x[i+x_start+1]);
-      result.push_back(solution.x[i+y_start+1]);
+  for (int i = 1; i < N; ++i) {
+      result.push_back(solution.x[i+x_start]);
+      result.push_back(solution.x[i+y_start]);
   }
   return result;
 }
