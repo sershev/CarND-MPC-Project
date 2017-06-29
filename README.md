@@ -3,6 +3,21 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+## Report
+
+The state contains the position, velocety, orientation. Also we calculate cte and epsi. And our actuators
+are the steering and acceleration values. To make the calculation easy we can transform the state into vehicles
+perspective.
+
+To stay on the road we fit a polynomial on waypoints and calculate the actuators for each state between 0 and N.
+After trying different values, I have chosen as for the timestamps N = 15 (this actually could be less) and dt = 0.05 (and this value could be higher), but anyway the car is able to follow the track with this settings.
+
+To handle latency we can asume where the car would be in 100ms an apply our calculation to this modified state.
+For some reason this actually had less impact on final result then I expected, in a real world I'm sure this kind of
+finetuning are much more important. 
+
+---
+
 ## Dependencies
 
 * cmake >= 3.5
