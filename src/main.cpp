@@ -106,11 +106,11 @@ int main() {
           Eigen::VectorXd coeffs = polyfit(x_values, y_values, 3);
 
           double cte = polyeval(coeffs, 0) ;
-          double epsi = -atan(coeffs[1]) ;
+          double x_with_100ms_latency = v*(1/36000)*cos(coeffs[1]);
+          double epsi = -atan(2*coeffs[1] * x_with_100ms_latency+3*coeffs[2]*x_with_100ms_latency*x_with_100ms_latency) ;
 
           Eigen::VectorXd state(6);
           //handle latency
-          double x_with_100ms_latency = v*(1/36000)*cos(coeffs[1]);
           state << x_with_100ms_latency,0,0,v,cte,epsi; // car view
 
           vector<double> actuators = mpc.Solve(state, coeffs);
